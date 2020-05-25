@@ -9,4 +9,8 @@ In order to use this application, you'll need to configure your Google credentia
 data files from Google Drive
 1. Configure your Google credentials based on [these instructions](https://support.google.com/googleapi/answer/6158862?hl=en)
 2. Ensure the credentials are configured to allow _Google Drive API_. Implementing an IP based restriction is also recommended
-3. set those credentials in 
+3. set those credentials in the `config.yml` file with the following format:
+```
+google-drive-creds:
+    your-api-key
+```
