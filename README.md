@@ -14,3 +14,21 @@ data files from Google Drive
 google-drive-creds:
     your-api-key
 ```
+
+### Operation
+The application is meant to be repeatable such that subsequent runs will always return the same result as long as the data source doesn't change. The reasoning behind this is because the fast pace that the data is changing because our understanding of COVID is rapidly changing. Additionally, the State of Colorado continues to add additional data points as time progresses.
+
+This application uses the base shapefile provided in the `shapefiles/base` directory to create derivative shapefiles from. Updates to the base shapefile will appear in all derivative shapefiles as well, with the limitation of the capabilities provided by pyshp
+
+### Statistic Mapping
+Due to the fact that ESRI Shapefile format only supports a max of 10 characters, the attribute table fields have been shortened. All statistics below are per county. Here is the mapping:
+
+| Field name| Mapped Statistic|
+|:---------:|:----------------:|
+| CASECOUNT | Total number of cases per county|
+| CASEPER100| Nubmer of cases per 100,000 people|
+| DEATHS | Total number of deaths |
+| PCR | Total number of PCR test conducted |
+| SEROLOGY | Total number of serology tests conducted |
+| TESTRATE | Rate of test per 100,000 people|
+| TOTALTESTS| Total number of tests conducted |
