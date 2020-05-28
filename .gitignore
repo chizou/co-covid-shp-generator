@@ -1,3 +1,5 @@
-config.yml
 .vscode
+config.yml
 downloads
+shapefiles/*
+!shapefiles/base
