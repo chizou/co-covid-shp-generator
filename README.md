@@ -24,11 +24,15 @@ data files from Google Drive
 google-drive-creds:
     your-api-key
 ```
+## Usage
+After Google API credentials are provided, the application can be run with the `-d` parameter to download the entire set of data and process all of it into shapefiles. On a default run, one new shapefile will be produced for every csv file that exists in the `downloads` directory. For every csv file in the `downloads` directory, a corresponding shapefile will be created in the `shapefiles` directory.
 
-### Operation
+If you only need to process a subset of the data, copy only that supset to the downloads `directory` to be processed into shapefiles.
+
+## Operation
 The application is meant to be repeatable such that subsequent runs will always return the same result as long as the data source doesn't change. The reasoning behind this is because the fast pace that the data is changing because our understanding of COVID is rapidly changing. Additionally, the State of Colorado continues to add additional data points as time progresses.
 
-This application uses the base shapefile provided in the `shapefiles/base` directory to create derivative shapefiles from. Updates to the base shapefile will appear in all derivative shapefiles as well, with the limitation of the capabilities provided by pyshp
+This application uses the base shapefile provided in the `shapefiles/base` directory to create derivative shapefiles from. Updates to the base shapefile will appear in all derivative shapefiles as well, with the limitation of the capabilities provided by (pyshp)[https://pypi.org/project/pyshp/]
 
 ### Statistic Mapping
 Due to the fact that ESRI Shapefile format only supports a max of 10 characters, the attribute table fields have been shortened. All statistics below are per county. Here is the mapping:
