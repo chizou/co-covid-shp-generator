@@ -25,10 +25,12 @@ def main():
 
     # First, download the csv files using our downloader class
     download = downloader.Downloader(api_key=gdrive_creds)
-    download.download(verbose=True)
+    download.download()
 
     # Once we have the files, process them
-    process = processor.CsvProcessor()
+    process = processor.CsvProcessor(base_shapefile='shapefiles/base/COUNITES.shp')
+    process.process_csvs()
+
 
 if __name__ == "__main__":
     main()
