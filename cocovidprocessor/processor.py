@@ -219,9 +219,8 @@ class CsvProcessor:
         else:
             dest_file = output_file
 
-        print(f"{src_file}.prj", f"{dest_file}.prj")
-
         copyfile(f"{src_file}.prj", f"{dest_file}.prj")
+        print(f"Wrote shapefile {dest_file}")
 
 
 if __name__ == "__main__":

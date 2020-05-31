@@ -3,6 +3,16 @@ case data](https://drive.google.com/drive/folders/1bBAC7H-pdEDgPxRuU_eR36ghzc0HW
 The application then processes the county specific data into the attribute table of a
 Colorado by county shapefile
 
+## Quick Start
+```
+git clone https://github.com/chizou/co-covid-shp-generator
+ d co-covid-shp-generator
+pip install  --upgrade -r requirements.txt
+mkdir downloads
+cp sample.csv downloads/
+python ./final_project.py
+```
+
 ## Configuration
 ### Google Drive Configuration
 In order to use this application, you'll need to configure your Google credentials to download
@@ -32,3 +42,7 @@ Due to the fact that ESRI Shapefile format only supports a max of 10 characters,
 | SEROLOGY | Total number of serology tests conducted |
 | TESTRATE | Rate of test per 100,000 people|
 | TOTALTESTS| Total number of tests conducted |
+
+## Contributing
+### pre-commit
+This repo usese pre-commit and requires python version 3.7. Since there are the potential for Google API secrets, we do use Yelp's detect-secrets which will need to be installed
