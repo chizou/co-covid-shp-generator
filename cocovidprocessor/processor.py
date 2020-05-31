@@ -31,7 +31,8 @@ class CsvProcessor:
         ]
         # Sometimes, a stat isn't reported for a county, so we need to use a list of Nones
         self.__null_fields = [None] * len((self.__new_field_defs))
-        self.__loaded_base_shape = None
+        self.__loaded_base_shape=None
+        self.__load_shape()
 
     # Processes a single CSV file as specified with the file parameter. The CSV
     # file expects to be in the format provided by the State of Colorado's COVID study
