@@ -3,6 +3,9 @@ case data](https://drive.google.com/drive/folders/1bBAC7H-pdEDgPxRuU_eR36ghzc0HW
 The application then processes the county specific data into the attribute table of a
 Colorado by county shapefile
 
+## Requirements
+The only requirement is python3 with pip installed.
+
 ## Quick Start
 ```
 git clone https://github.com/chizou/co-covid-shp-generator
