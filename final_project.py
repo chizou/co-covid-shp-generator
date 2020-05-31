@@ -5,11 +5,12 @@
 # The application then processes the county specific data into the attribute table of a
 # Colorado by county shapefile
 
-from cocovidprocessor import downloader
-from cocovidprocessor import processor
+import sys
+
 import click
 import yaml
-import sys
+from cocovidprocessor import downloader, processor
+
 
 def load_configs():
     with open("config.yml") as configfh:
@@ -19,12 +20,19 @@ def load_configs():
             print(f"Exiting... Error loading config: {e}")
             sys.exit()
 
+
 @click.command()
-@click.option("-d", "--download", default=False, is_flag=True, help="Set to true to download new files, requires API key to be set")
+@click.option(
+    "-d",
+    "--download",
+    default=False,
+    is_flag=True,
+    help="Set to true to download new files, requires API key to be set",
+)
 def main(download):
     if download:
         configs = load_configs()
-        gdrive_creds = configs['google-drive-creds']
+        gdrive_creds = configs["google-drive-creds"]
 
         # First, download the csv files using our downloader class
         download = downloader.Downloader(api_key=gdrive_creds)
@@ -37,5 +45,3 @@ def main(download):
 
 if __name__ == "__main__":
     main()
-
-
