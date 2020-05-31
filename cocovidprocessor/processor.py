@@ -12,7 +12,7 @@ import pprint
 # This class handles ingestion of the CSV data files, associating them with
 # the appropriate attribute table in the shapefile, and then writing the output shapefile
 class CsvProcessor:
-    def __init__(self, base_shapefile, data_dir='downloads', output_dir='shapefiles', output_file=None):
+    def __init__(self, base_shapefile='./shapefiles/base/COUNTIES', data_dir='downloads', output_dir='shapefiles', output_file=None):
         self._data_dir = data_dir
         self._base_shapefile = base_shapefile
         self._output_dir = output_dir
@@ -29,6 +29,8 @@ class CsvProcessor:
             [ "DEATHS", "N", 7, 0 ],
             [ "TESTRATE", "N", 7, 2 ],
         ]
+        # Sometimes, a stat isn't reported for a county, so we need to use a list of Nones
+        self.__null_fields = [None] * len((self.__new_field_defs))
         self.__loaded_base_shape = None
 
     # Processes a single CSV file as specified with the file parameter. The CSV
@@ -69,7 +71,7 @@ class CsvProcessor:
                     att_name = "PCR"
                 else:
                     # If we ever detect a new COVID-19 test type, we should notify
-                    # us so that we can add it
+                    # so that we can add it
                     print(f"New COVID-19 Test detected: {row['metric']}")
                     continue
             elif statistic == "Case Rates":
@@ -84,8 +86,8 @@ class CsvProcessor:
 
             # Some of the county names include the word "County", so let's remove it
             county = row['attribute'].replace(" County", "")
-            # some cells have nan, so set to 0
-            stat_list[county][att_name] = 0 if math.isnan(row['value']) else row['value']
+            # some cells have nan, so set to None
+            stat_list[county][att_name] = None if math.isnan(row['value']) else row['value']
 
         return stat_list
 
@@ -93,7 +95,7 @@ class CsvProcessor:
     # updates the base shapefile that's been ingested by load_shape and merges it with the csv
     # file that's been ingested by ingest_single_csv so that the file can be written
     # with save_shape()
-    def update_county_shapefile(self, county_metrics):
+    def __update_county_shapefile(self, county_metrics):
         if self.__loaded_base_shape is None:
             raise Exception("base shape file hasn't been loaded yet.")
 
@@ -111,37 +113,49 @@ class CsvProcessor:
                 try:
                     new_values.append(stats[field])
                 except KeyError:
-                    # Not all counties have a metric, so set to 0
-                    new_values.append(0)
+                    # Not all counties have a metric, so set to None
+                    new_values.append(None)
             try:
-                shaperecs[county.upper()]['record'] = shaperecs[county.upper()]['record'] + new_values
+                county_upper = county.upper()
+                shaperecs[county_upper]['record'] = shaperecs[county_upper]['record'] + new_values
             except KeyError:
                 # Some dummy values are in the counties field, e.g. UNKNOWN
                 continue
+
+        # Some of the older reports don't contain all the counties. So for each CSV, we
+        # calculate the set of names in there then subtract them from the set of all county
+        # shapefile. Finally, set all those fileds to None
+        county_names = shaperecs.keys()
+        county_names_metrics = (key.upper() for key in county_metrics.keys())
+        missing_counties = county_names - county_names_metrics
+        for county in missing_counties:
+            shaperecs[county]['record'] = shaperecs[county]['record'] + self.__null_fields
 
         merged_shapefile = {
             "fields": fields,
             "shaperecs": shaperecs,
         }
-        print(merged_shapefile)
         return merged_shapefile
 
 
     # Iterate through all the downloaded files and create an updated shapefile for each
     # csv by date
     def process_csvs(self):
-        file_list = glob(f"{self._data_dir}/*05-23.csv")
+        file_list = glob(f"{self._data_dir}/*.csv")
         for file in file_list:
             county_metrics = self.ingest_single_csv(file)
-            merged_file = self.update_county_shapefile(county_metrics)
-            self._save_shape(merged_file)
+            # ingest_single_csv() encountered an empty file
+            if county_metrics is None:
+                continue
+            merged_file = self.__update_county_shapefile(county_metrics)
+            self.__save_shape(merged_file, re.sub(rf"{self._data_dir}[\\/]|\.csv", "", file))
 
 
     # Load the contents of the shapefile into a dict as follows:
     # fields - contains the pyshp formatted list of fields
     # shape - an dict of dicts that contains every row in the existing shapefile. We
     #         key off the name of the column to make updating existing counties easier
-    def _load_shape(self):
+    def __load_shape(self):
         shaperecs = {}
         with shapefile.Reader(self._base_shapefile) as shp:
             fields = shp.fields[1:]
@@ -157,12 +171,14 @@ class CsvProcessor:
         }
 
 
-    # takes a dict as defined in _load_shape() and saves that into a shapefile. We
-    # allow an optional output_path specification in case we're trying to create other
+    # takes a dict as defined in __load_shape() and saves that into a shapefile. We
+    # allow an optional output_name in case we're trying to create other
     # shapefiles
-    def _save_shape(self, shape, output_path=None):
-        if output_path is None:
+    def __save_shape(self, shape, output_name=None):
+        if output_name is None:
             output_file = f"{self._output_dir}/{self._output_file}"
+        else:
+            output_file = f"{self._output_dir}/{output_name}"
         fields = shape['fields']
         shaperecs = shape['shaperecs']
         with shapefile.Writer(output_file) as shp:
@@ -178,17 +194,16 @@ class CsvProcessor:
         else:
             src_file = self._base_shapefile
 
-        if self._output_file[-4:] == '.shp':
-            dest_file = self._output_file[:-4]
+        if output_file[-4:] == '.shp':
+            dest_file = output_file[:-4]
         else:
-            dest_file = self._output_file
+            dest_file = output_file
 
-        copyfile(f"{src_file}.prj", f"{self._output_dir}/{dest_file}.prj")
+        print(f"{src_file}.prj", f"{dest_file}.prj")
 
+        copyfile(f"{src_file}.prj", f"{dest_file}.prj")
 
 
 if __name__ == "__main__":
-    bla = CsvProcessor(base_shapefile='./shapefiles/base/COUNTIES')
-    bla._load_shape()
+    bla = CsvProcessor()
     bla.process_csvs()
-    #bla._save_shape(shape)
