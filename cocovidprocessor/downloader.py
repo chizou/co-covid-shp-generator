@@ -12,7 +12,7 @@ from apiclient.http import MediaIoBaseDownload
 class Downloader:
     def __init__(self, api_key, data_dir="downloads", parent_id="1bBAC7H-pdEDgPxRuU_eR36ghzc0HWNf1"):
         self._data_dir = data_dir
-        self._parent_id = parent_id
+        self.__parent_id = parent_id
         if not os.path.exists(data_dir):
             os.mkdir(data_dir)
         self._service = build('drive', 'v3', developerKey=api_key)
@@ -28,8 +28,7 @@ class Downloader:
     # refresh - specify whether to redownload files or skip files if they already exist
     def download(self, refresh=False, verbose=False):
         # filter the GDrive query to only query the CO Covid drive and only csv or google sheet files
-        parent_id = "1bBAC7H-pdEDgPxRuU_eR36ghzc0HWNf1"
-        query = f"'{parent_id}' in parents and (mimeType contains 'text/csv')"
+        query = f"'{self.__parent_id}' in parents and (mimeType contains 'text/csv')"
 
         if not refresh:
             self._get_file_list()

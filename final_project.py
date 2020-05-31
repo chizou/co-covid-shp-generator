@@ -7,6 +7,7 @@
 
 from cocovidprocessor import downloader
 from cocovidprocessor import processor
+import click
 import yaml
 import sys
 
@@ -18,17 +19,19 @@ def load_configs():
             print(f"Exiting... Error loading config: {e}")
             sys.exit()
 
+@click.command()
+@click.option("-d", "--download", default=False, is_flag=True, help="Set to true to download new files, requires API key to be set")
+def main(download):
+    if download:
+        configs = load_configs()
+        gdrive_creds = configs['google-drive-creds']
 
-def main():
-    configs = load_configs()
-    gdrive_creds = configs['google-drive-creds']
-
-    # First, download the csv files using our downloader class
-    download = downloader.Downloader(api_key=gdrive_creds)
-    download.download()
+        # First, download the csv files using our downloader class
+        download = downloader.Downloader(api_key=gdrive_creds)
+        download.download(verbose=True)
 
     # Once we have the files, process them
-    process = processor.CsvProcessor(base_shapefile='shapefiles/base/COUNITES.shp')
+    process = processor.CsvProcessor()
     process.process_csvs()
 
 
