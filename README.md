@@ -6,7 +6,7 @@ Colorado by county shapefile
 ## Quick Start
 ```
 git clone https://github.com/chizou/co-covid-shp-generator
- d co-covid-shp-generator
+cd co-covid-shp-generator
 pip install  --upgrade -r requirements.txt
 mkdir downloads
 cp sample.csv downloads/
