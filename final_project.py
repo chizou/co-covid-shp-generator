@@ -35,8 +35,8 @@ def main(download):
         gdrive_creds = configs["google-drive-creds"]
 
         # First, download the csv files using our downloader class
-        download = downloader.Downloader(api_key=gdrive_creds)
-        download.download(verbose=True)
+        dl = downloader.Downloader(api_key=gdrive_creds)
+        dl.download(verbose=True)
 
     # Once we have the files, process them
     process = processor.CsvProcessor()
